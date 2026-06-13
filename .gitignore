@@ -1,0 +1,5 @@
+wpoms_admin/
+wpoms_web/
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
