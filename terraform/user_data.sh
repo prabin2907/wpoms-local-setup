@@ -19,6 +19,9 @@ echo "Creating Docker CLI plugins directory..."
 mkdir -p /usr/libexec/docker/cli-plugins
 ln -sf /usr/local/bin/docker-compose /usr/libexec/docker/cli-plugins/docker-compose
 
+echo "Installing AWS CLI..."
+apt-get install -y awscli
+
 echo "Adding ubuntu user to docker group..."
 usermod -aG docker ubuntu
 
