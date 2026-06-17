@@ -5,6 +5,12 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  VERSION_PREFIX: "v1.0"
+
 jobs:
   build-and-push:
     name: Build & Push to ECR
@@ -17,9 +23,9 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
     - name: Log in to Amazon ECR
       id: login-ecr
@@ -29,20 +35,82 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: wpoms-frontend-p
-        IMAGE_TAG: ${{ github.sha }}
+        COMMIT_SHA: ${{ github.sha }}
+        BUILD_NUMBER: ${{ github.run_number }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./wpoms_web
-        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        # Build with commit SHA
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA ./wpoms_web
+
+        # Tag 1: Date + Commit SHA
+        DATE_TAG=$(date +%Y-%m-%d)-$COMMIT_SHA
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA $ECR_REGISTRY/$ECR_REPOSITORY:$DATE_TAG
+
+        # Tag 2: Version (v1.0.1, v1.0.2, etc.)
+        VERSION_TAG=${{ env.VERSION_PREFIX }}.$BUILD_NUMBER
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG
+
+        # Push all tags
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$DATE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG
 
     - name: Build and push Backend Image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: wpoms-backend-p
-        IMAGE_TAG: ${{ github.sha }}
+        COMMIT_SHA: ${{ github.sha }}
+        BUILD_NUMBER: ${{ github.run_number }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./wpoms_admin
-        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        # Build with commit SHA
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA ./wpoms_admin
+
+        # Tag 1: Date + Commit SHA
+        DATE_TAG=$(date +%Y-%m-%d)-$COMMIT_SHA
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA $ECR_REGISTRY/$ECR_REPOSITORY:$DATE_TAG
+
+        # Tag 2: Version (v1.0.1, v1.0.2, etc.)
+        VERSION_TAG=${{ env.VERSION_PREFIX }}.$BUILD_NUMBER
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG
+
+        # Push all tags
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$DATE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG
+
+    - name: Generate final docker-compose.yml
+      run: |
+        sed -e "s|__ECR_REGISTRY__|${{ steps.login-ecr.outputs.registry }}|g" \
+            docker-compose.ec2.yml > docker-compose.yml
+
+    - name: Upload docker-compose.yml to S3
+      run: |
+        aws s3 cp docker-compose.yml s3://wpoms-deploy-artifacts-p/docker-compose.yml
+
+  # deploy:
+  #   name: Deploy to EC2
+  #   runs-on: ubuntu-latest
+  #   needs: build-and-push
+
+  #   steps:
+  #   - name: Configure AWS Credentials
+  #     uses: aws-actions/configure-aws-credentials@v4
+  #     with:
+  #       aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+  #       aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+  #       aws-region: ${{ env.AWS_REGION }}
+
+  #   - name: Deploy to EC2 via SSH
+  #     uses: appleboy/ssh-action@v1.0.3
+  #     with:
+  #       host: ${{ secrets.EC2_HOST }}
+  #       username: ${{ secrets.EC2_USER }}
+  #       key: ${{ secrets.EC2_SSH_KEY }}
+  #       script: |
+  #         # Download docker-compose.yml from S3
+  #         aws s3 cp s3://wpoms-deploy-artifacts-p/docker-compose.yml /home/ubuntu/app/docker-compose.yml
+          
+  #         cd /home/ubuntu/app
+  #         aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
+  #         sudo docker-compose down || true
+  #         sudo docker-compose pull
+  #         sudo docker-compose up -d
