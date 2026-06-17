@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Copy .env to make VITE_ vars available
-#COPY .env .env
+COPY .env .env
 
 # Set environment variables for HTTPS
 #ENV KEY_PATH=/app/cert/127.0.0.1+2-key.pem
