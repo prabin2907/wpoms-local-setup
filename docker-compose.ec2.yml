@@ -13,7 +13,7 @@ services:
     restart: always
 
   backend:
-    image: 924982554051.dkr.ecr.ap-south-1.amazonaws.com/wpoms-backend-p:latest
+    image: __ECR_REGISTRY__/wpoms-backend-p:__IMAGE_TAG__
     container_name: wpoms-backend
     ports:
       - "8081:8081"
@@ -27,7 +27,7 @@ services:
     restart: always
 
   frontend:
-    image: 924982554051.dkr.ecr.ap-south-1.amazonaws.com/wpoms-frontend-p:latest
+    image: __ECR_REGISTRY__/wpoms-frontend-p:__IMAGE_TAG__
     container_name: wpoms-frontend
     ports:
       - "5173:5173"

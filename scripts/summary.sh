@@ -16,12 +16,12 @@ echo "### Artifacts" >> $SUMMARY_FILE
 echo "- docker-compose.yml uploaded to S3: $S3_BUCKET" >> $SUMMARY_FILE
 echo "" >> $SUMMARY_FILE
 
-# echo "### Deployment" >> $SUMMARY_FILE
-# echo "- EC2 Host: $EC2_HOST" >> $SUMMARY_FILE
-# echo "- Status: Deployed successfully" >> $SUMMARY_FILE
-# echo "" >> $SUMMARY_FILE
+echo "### Deployment" >> $SUMMARY_FILE
+echo "- EC2 Host: $EC2_HOST" >> $SUMMARY_FILE
+echo "- Status: Deployed successfully" >> $SUMMARY_FILE
+echo "" >> $SUMMARY_FILE
 
-# echo "### Build Details" >> $SUMMARY_FILE
-# echo "- Commit SHA: $COMMIT_SHA" >> $SUMMARY_FILE
-# echo "- Build Number: $BUILD_NUMBER" >> $SUMMARY_FILE
-# echo "- Workflow Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $SUMMARY_FILE
+echo "### Build Details" >> $SUMMARY_FILE
+echo "- Commit SHA: $COMMIT_SHA" >> $SUMMARY_FILE
+echo "- Build Number: $BUILD_NUMBER" >> $SUMMARY_FILE
+echo "- Workflow Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $SUMMARY_FILE
