@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "Creating 2GB swap file..."
-sudo fallocate -l 2G /swapfile
+echo "Creating 1GB swap file..."
+sudo fallocate -l 1G /swapfile
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
