@@ -52,6 +52,7 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
         S3_BUCKET: ${{ env.S3_BUCKET }}
+        BUILD_NUMBER: ${{ github.run_number }}
       run: |
         chmod +x ./scripts/upload-s3.sh
         ./scripts/upload-s3.sh
