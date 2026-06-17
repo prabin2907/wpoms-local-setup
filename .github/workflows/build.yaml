@@ -16,35 +16,35 @@ env:
 
 jobs:
   build-and-push:
-  name: Build & Push to ECR
-  runs-on: ubuntu-latest
+    name: Build & Push to ECR
+    runs-on: ubuntu-latest
 
-  steps:
-  - name: Checkout Code
-    uses: actions/checkout@v4
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-  - name: Configure AWS Credentials
-    uses: aws-actions/configure-aws-credentials@v4
-    with:
-      aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-      aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-      aws-region: ${{ env.AWS_REGION }}
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
-  - name: Login to Amazon ECR
-    id: ecr
-    uses: aws-actions/amazon-ecr-login@v2
+    - name: Login to Amazon ECR
+      id: ecr
+      uses: aws-actions/amazon-ecr-login@v2
 
-  - name: Build and Push
-    env:
-      ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
-      COMMIT_SHA: ${{ github.sha }}
-      BUILD_NUMBER: ${{ github.run_number }}
-      VERSION_PREFIX: ${{ env.VERSION_PREFIX }}
-      ECR_REPOSITORY_FRONTEND: ${{ env.ECR_REPOSITORY_FRONTEND }}
-      ECR_REPOSITORY_BACKEND: ${{ env.ECR_REPOSITORY_BACKEND }}
-    run: |
-      chmod +x ./scripts/build.sh
-      ./scripts/build.sh
+    - name: Build and Push
+      env:
+        ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
+        COMMIT_SHA: ${{ github.sha }}
+        BUILD_NUMBER: ${{ github.run_number }}
+        VERSION_PREFIX: ${{ env.VERSION_PREFIX }}
+        ECR_REPOSITORY_FRONTEND: ${{ env.ECR_REPOSITORY_FRONTEND }}
+        ECR_REPOSITORY_BACKEND: ${{ env.ECR_REPOSITORY_BACKEND }}
+      run: |
+        chmod +x ./scripts/build.sh
+        ./scripts/build.sh
 
     - name: Upload to S3
       env:
