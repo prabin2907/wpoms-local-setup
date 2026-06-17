@@ -50,7 +50,6 @@ jobs:
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG
 
         # Push all tags
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$DATE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG
 
@@ -73,7 +72,6 @@ jobs:
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG
 
         # Push all tags
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$DATE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG
 
