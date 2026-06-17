@@ -11,6 +11,9 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 echo "Updating packages..."
 apt-get update -y
 
+echo "Installing unzip..."
+apt-get install -y unzip 
+
 echo "Installing Docker..."
 apt-get install -y docker.io
 
