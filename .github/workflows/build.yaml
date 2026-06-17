@@ -18,6 +18,8 @@ jobs:
   build-and-push:
     name: Build & Push to ECR
     runs-on: ubuntu-latest
+    outputs:
+      ecr_registry: ${{ steps.ecr.outputs.registry }}
 
     steps:
     - name: Checkout Code
@@ -75,18 +77,14 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         envs: AWS_REGION,ECR_REGISTRY,S3_BUCKET,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY
         script: |
-          # Configure AWS CLI on EC2
+          export ECR_REGISTRY=${{ needs.build-and-push.outputs.ecr_registry }}
+
           aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set default.region $AWS_REGION
 
-          # Download deploy script from S3
           aws s3 cp s3://$S3_BUCKET/deploy.sh /home/ubuntu/deploy.sh
-
-          # Make it executable
           chmod +x /home/ubuntu/deploy.sh
-
-          # Run the deploy script
           /home/ubuntu/deploy.sh
 
   summary:
