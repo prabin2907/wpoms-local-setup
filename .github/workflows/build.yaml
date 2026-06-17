@@ -73,14 +73,19 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
-        envs: AWS_REGION,ECR_REGISTRY,S3_BUCKET
+        envs: AWS_REGION,ECR_REGISTRY,S3_BUCKET,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY
         script: |
+          # Configure AWS CLI on EC2
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set default.region $AWS_REGION
+
           # Download deploy script from S3
           aws s3 cp s3://$S3_BUCKET/deploy.sh /home/ubuntu/deploy.sh
-          
+
           # Make it executable
           chmod +x /home/ubuntu/deploy.sh
-          
+
           # Run the deploy script
           /home/ubuntu/deploy.sh
 
