@@ -9,6 +9,7 @@ resource "aws_ecr_repository" "repos" {
   for_each = var.repositories
   name     = each.value
   force_delete = true
+  image_tag_mutability = "IMMUTABLE"
 }
 
 output "repo_urls" {
