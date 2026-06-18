@@ -35,7 +35,10 @@ public class SecurityConfig {
                         // ========== PUBLIC ENDPOINTS ==========
                         .requestMatchers(
                                 "/api/login",
-                                "/api/register")
+                                "/api/register",
+                                "/api/customer/register-customer",
+                                "/api/vendor/register",
+                                "/api/admin/register-manufacturer")
                         .permitAll()
 
                         // ========== SWAGGER UI ENDPOINTS ==========
@@ -49,14 +52,12 @@ public class SecurityConfig {
 
                         // ========== CUSTOMER ENDPOINTS (Only CUSTOMER role) ==========
                         .requestMatchers(
-                                "/api/customer/register-customer",
                                 "/api/customer/view-customer",
                                 "/api/customer/update-customer")
                         .hasRole("CUSTOMER")
 
                         // ========== VENDOR ENDPOINTS (Only VENDOR role) ==========
                         .requestMatchers(
-                                "/api/vendor/register",
                                 "/api/vendor/get",
                                 "/api/vendor/edit",
                                 "/api/vendor/create-staff",
@@ -65,7 +66,6 @@ public class SecurityConfig {
 
                         // ========== MANUFACTURER ENDPOINTS (Only MANUFACTURER role) ==========
                         .requestMatchers(
-                                "/api/admin/register-manufacturer",
                                 "/api/admin/manufacturer",
                                 "/api/admin/update-manufacture",
                                 "/api/admin/manufacturer/create-staff",
