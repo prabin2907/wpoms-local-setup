@@ -101,7 +101,7 @@ jobs:
       env:
         VERSION_PREFIX: ${{ env.VERSION_PREFIX }}
         BUILD_NUMBER: ${{ github.run_number }}
-        S3_BUCKET: ${{ env.S3_BUCKET }}
+        DATE_TAG: $(date +%Y-%m-%d)-${{ github.sha }}
         EC2_HOST: ${{ secrets.EC2_HOST }}
         COMMIT_SHA: ${{ github.sha }}
         GITHUB_SERVER_URL: ${{ github.server_url }}
