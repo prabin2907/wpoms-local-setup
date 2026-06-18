@@ -4,6 +4,8 @@ set -e
 # GitHub workflow summary
 SUMMARY_FILE=$GITHUB_STEP_SUMMARY
 
+DATE_TAG=$(date +%Y-%m-%d)-$COMMIT_SHA
+
 echo "## Deployment Status: SUCCESS" >> $SUMMARY_FILE
 echo "" >> $SUMMARY_FILE
 
