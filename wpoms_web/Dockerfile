@@ -14,10 +14,6 @@ COPY . .
 # Copy .env to make VITE_ vars available
 COPY .env .env
 
-# Set environment variables for HTTPS
-#ENV KEY_PATH=/app/cert/127.0.0.1+2-key.pem
-#ENV CERT_PATH=/app/cert/127.0.0.1+2.pem
-
 # Expose Vite dev server port
 EXPOSE 5173
 
